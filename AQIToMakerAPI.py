@@ -51,8 +51,10 @@ class WavePlus():
         if (self.MacAddr is None):
             scanner     = Scanner().withDelegate(DefaultDelegate())
             searchCount = 0
-            while self.MacAddr is None and searchCount < 50:
-                devices      = scanner.scan(0.1) # 0.1 seconds scan period
+            #I have my wave plus and the pi zero W this runs on mounted directly across from each other in a standard hallway
+            #It still fails at 0.1 and 50 more than once a day.
+            while self.MacAddr is None and searchCount < 100:
+                devices      = scanner.scan(0.2) # 0.1 seconds scan period
                 searchCount += 1
                 for dev in devices:
                     ManuData = dev.getValueText(255)
@@ -151,20 +153,29 @@ sleep_period = config['General'].get('sleep_period', 300)
 waveplus = WavePlus(serialNumber)
 
 while True:
-    waveplus.connect()
-    sensors = waveplus.read()
-    print('Read')
-    waveplus.disconnect()
-
-    sensorData = "{},{},{},{},{},{},{}".format( 
-        sensors.getValue(SENSOR_IDX_TEMPERATURE), 
-        sensors.getValue(SENSOR_IDX_HUMIDITY), 
-        sensors.getValue(SENSOR_IDX_REL_ATM_PRESSURE), 
-        sensors.getValue(SENSOR_IDX_CO2_LVL), 
-        sensors.getValue(SENSOR_IDX_VOC_LVL), 
-        sensors.getValue(SENSOR_IDX_RADON_SHORT_TERM_AVG), 
-        sensors.getValue(SENSOR_IDX_RADON_LONG_TERM_AVG))
-    
-    data = requests.get("{}/apps/api/{}/devices/{}/setValuesNoPM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, sensorData, makerAPIToken))
+    try:
+        waveplus.connect()
+        sensors = waveplus.read()
+        print('Read')
+    except:
+        try:
+            data.requests.get("{}/apps/api/{}/devices/{}/errorNotFound?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
+        finally:
+            pass
+    else:
+        sensorData = "{},{},{},{},{},{},{}".format( 
+            sensors.getValue(SENSOR_IDX_TEMPERATURE), 
+            sensors.getValue(SENSOR_IDX_HUMIDITY), 
+            sensors.getValue(SENSOR_IDX_REL_ATM_PRESSURE), 
+            sensors.getValue(SENSOR_IDX_CO2_LVL), 
+            sensors.getValue(SENSOR_IDX_VOC_LVL), 
+            sensors.getValue(SENSOR_IDX_RADON_SHORT_TERM_AVG), 
+            sensors.getValue(SENSOR_IDX_RADON_LONG_TERM_AVG))
+        try:
+            data = requests.get("{}/apps/api/{}/devices/{}/setValuesNoPM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, sensorData, makerAPIToken))
+        finally:
+            pass
+    finally:
+        waveplus.disconnect()
 
     sleep(sleep_period)

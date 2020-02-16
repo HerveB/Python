@@ -113,7 +113,7 @@ class Sensors():
             self.sensor_data[SENSOR_IDX_HUMIDITY]             = rawData[1]/2
             self.sensor_data[SENSOR_IDX_RADON_SHORT_TERM_AVG] = self.conv2radon(rawData[4])
             self.sensor_data[SENSOR_IDX_RADON_LONG_TERM_AVG]  = self.conv2radon(rawData[5])
-            self.sensor_data[SENSOR_IDX_TEMPERATURE]          = ((rawData[6]/100)*1.8)+32
+            self.sensor_data[SENSOR_IDX_TEMPERATURE]          = rawData[6]/100
             self.sensor_data[SENSOR_IDX_REL_ATM_PRESSURE]     = rawData[7]/50.0
             self.sensor_data[SENSOR_IDX_CO2_LVL]              = rawData[8]*1.0
             self.sensor_data[SENSOR_IDX_VOC_LVL]              = rawData[9]*1.0

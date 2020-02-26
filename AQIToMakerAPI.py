@@ -159,7 +159,7 @@ while True:
         print('Read')
     except:
         try:
-            data.requests.get("{}/apps/api/{}/devices/{}/errorNotFound?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
+            requests.get("{}/apps/api/{}/devices/{}/errorNotFound/?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
         finally:
             pass
     else:

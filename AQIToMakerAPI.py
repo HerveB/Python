@@ -147,7 +147,7 @@ makerAPIDeviceID = config['Hubitat'].get('deviceID')
 
 serialNumber = config['General'].get('SerialNumber')
 
-sleep_period = config['General'].get('sleep_period', 300)
+sleep_period = config['General'].get('period', 300)
 
 #---- Initialize ----#
 waveplus = WavePlus(serialNumber)

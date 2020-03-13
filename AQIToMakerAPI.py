@@ -147,7 +147,7 @@ makerAPIDeviceID = config['Hubitat'].get('deviceID')
 
 serialNumber = config['General'].get('SerialNumber')
 
-sleep_period = config['General'].get('period', 300)
+sleep_period = float(config['General'].get('period', 300))
 
 #---- Initialize ----#
 waveplus = WavePlus(serialNumber)
@@ -160,7 +160,7 @@ while True:
     except:
         try:
             requests.get("{}/apps/api/{}/devices/{}/errorNotFound/?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
-        finally:
+        except:
             pass
     else:
         sensorData = "{},{},{},{},{},{},{}".format( 
@@ -172,8 +172,8 @@ while True:
             sensors.getValue(SENSOR_IDX_RADON_SHORT_TERM_AVG), 
             sensors.getValue(SENSOR_IDX_RADON_LONG_TERM_AVG))
         try:
-            data = requests.get("{}/apps/api/{}/devices/{}/setValuesNoPM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, sensorData, makerAPIToken))
-        finally:
+            requests.get("{}/apps/api/{}/devices/{}/setValuesNoPM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, sensorData, makerAPIToken))
+        except:
             pass
     finally:
         waveplus.disconnect()

@@ -130,7 +130,12 @@ while True:
 
     hm3301.read_data()
     try:
-        data = requests.get("{}/apps/api/{}/devices/{}/setValuePM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, hm3301.PM_2_5_standard_particulate, makerAPIToken))
+        requests.get("{}/apps/api/{}/devices/{}/setValuePM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, hm3301.PM_2_5_standard_particulate, makerAPIToken))
+    except:
+        try:
+            requests.get("{}/apps/api/{}/devices/{}/errorNotFound/?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
+        except:
+            pass
     finally:
         pass
     sleep(sleep_period)

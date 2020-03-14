@@ -78,7 +78,7 @@ class HM3301:
         data = list(msg)
 
         if not hm3301.check_crc(data):
-            raise self.Error("CRC check failed")
+            return False
 
         self.sensor_number = data[2] << 8 | data[3]
 
@@ -96,6 +96,7 @@ class HM3301:
         self.particles_2_5 = data[22] << 8 | data[23]
         self.particles_5_0 = data[24] << 8 | data[25]
         self.particles_10 =  data[26] << 8 | data[27]
+        return True
 
     def check_crc(self,data):
         sum = 0
@@ -128,14 +129,19 @@ while True:
 
     sleep(.1)
 
-    hm3301.read_data()
-    try:
-        requests.get("{}/apps/api/{}/devices/{}/setValuePM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, hm3301.PM_2_5_standard_particulate, makerAPIToken))
-    except:
+    if hm3301.read_data():
         try:
-            requests.get("{}/apps/api/{}/devices/{}/errorNotFound/?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
+            requests.get("{}/apps/api/{}/devices/{}/setValuePM2_5/{}?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, hm3301.PM_2_5_standard_particulate, makerAPIToken))
         except:
+            try:
+                requests.get("{}/apps/api/{}/devices/{}/errorNotFound/?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
+            except:
+                pass
+        finally:
             pass
-    finally:
-        pass
+    else:
+            try:
+                requests.get("{}/apps/api/{}/devices/{}/errorNotFound/?access_token={}".format(makerAPIHostname, makerAPIAppID, makerAPIDeviceID, makerAPIToken))
+            except:
+                pass
     sleep(sleep_period)
